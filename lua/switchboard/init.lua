@@ -33,6 +33,7 @@ vim.api.nvim_create_user_command(
         complete = function()
         return {
             "lazygit",
+            "yazi",
             "Run",
             "RunV",
             "RunH",
