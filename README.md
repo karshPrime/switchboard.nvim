@@ -4,9 +4,12 @@ Neovim plugin designed to simplify the process of compiling and running projects
 within tmux panes or windows. Supports multiple programming languages by
 allowing customisation of build and run commands.
 
-![preview](.media/screenshot.gif)
+Also supports running [lazygit](https://github.com/jesseduffield/lazygit) from
+within current Neovim session on an overlay terminal.
 
-⚠️ [Compatibility Broken](#important-notice-backward-compatibility) ⚠️
+⚠️ [Version 2 Backward Compatibility Broken](#important-notice-backward-compatibility) ⚠️
+
+![preview](.media/screenshot.gif)
 
 ## Install & Setup
 
@@ -19,10 +22,11 @@ And setup it with:
 ```lua
 require('switchboard').setup({
     -- Overriding default configurations. [OPTIONAL]
-    overlay_sleep = 1,                 -- Pause before overlay autocloses
-    overlay_width_percent = 80,        -- Overlay width percentage
-    overlay_height_percent = 80,       -- Overlay height percentage
-    build_run_window_title = "build",  -- Tmux window name for Build/Run
+    save_session = true,              -- Save file before action
+    overlay_sleep = 1,                -- Pause before overlay autoclose; seconds
+    overlay_width_percent = 80,       -- Overlay width percentage
+    overlay_height_percent = 80,      -- Overlay height percentage
+    build_run_window_title = "build", -- Tmux window name for Build/Run
 
     -- Languages' Run and Build actions.  [REQUIRED]
     build_run_config = {
@@ -70,6 +74,7 @@ vim.keymap.set('n','<F5>', ':Switchboard Run<CR>', {silent=true})
 | Run program in a tmux new window                        | `:Switchboard RunBG`  |
 | Run program in a new pane next to current nvim pane     | `:Switchboard RunV`   |
 | Run program in a new pane bellow current nvim pane      | `:Switchboard RunH`   |
+| Open lazygit in overlay                                 | `:Switchboard lazygit`|
 
 \* **Run** here includes both compiling and running the program, depending on the
 run command specified for the file extension.

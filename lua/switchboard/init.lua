@@ -5,6 +5,7 @@
 
 local M = {}
 M.config = {
+    save_session = false,
     overlay_sleep = 1,
     overlay_width_percent = 80,
     overlay_height_percent = 80,
@@ -13,12 +14,14 @@ M.config = {
 }
 
 function M.setup(config)
+    M.config.save_session = config.save_session or M.config.save_session
     M.config.overlay_sleep = config.overlay_sleep or M.config.overlay_sleep
     M.config.overlay_width_percent = config.overlay_width_percent or M.config.overlay_width_percent
     M.config.overlay_height_percent = config.overlay_height_percent or M.config.overlay_height_percent
     M.config.build_run_window_title = config.build_run_window_title or M.config.build_run_window_title
     M.config.build_run_config = config.build_run_config or M.config.build_run_config
 end
+
 
 --# CHECK ENVIRONMENT #---------------------------------------------------------
 
@@ -32,6 +35,7 @@ local function is_tmux_running()
     return vim.env.TMUX ~= nil
 end
 
+
 --# HELPER FUNCTIONS #----------------------------------------------------------
 
 -- get the file extension
@@ -40,19 +44,19 @@ local function get_file_extension()
     return filename:match("^.+(%..+)$"):sub(2)
 end
 
--- get build and run commands based on file extension
+-- get build, run & debug commands based on file extension
 local function get_commands_for_extension(extension)
     if extension then
         for _, cfg in ipairs(M.config.build_run_config) do
             if vim.tbl_contains(cfg.extension, extension) then
-                return cfg.build, cfg.run
+                return cfg.build, cfg.run, cfg.debug
             end
         end
         print("Error: No build and run commands found for this extension")
     else
         print("Error: No file extension found")
     end
-    return nil, nil
+    return nil, nil, nil
 end
 
 -- check if a tmux window with the given name exists
@@ -60,6 +64,7 @@ local function tmux_window_exists(window_name)
     local result = vim.fn.system("tmux list-windows | grep -w " .. window_name)
     return result ~= ""
 end
+
 
 --# CALL FUNCTIONS #------------------------------------------------------------
 
@@ -84,14 +89,14 @@ local function new_window(cmd)
 end
 
 -- run command in an overlay pane
-local function overlay(cmd)
+local function overlay(cmd, sleep_duration)
     if cmd then
         local proj_dir = vim.fn.trim(vim.fn.system("pwd"))
         local cmd_head = "silent !tmux display-popup -E -d" .. proj_dir
 
         local dimensions = " -w " .. M.config.overlay_width_percent .. "\\% -h " .. M.config.overlay_height_percent .. "\\% '"
 
-        local sleep = "; sleep " .. M.config.overlay_sleep .. "'"
+        local sleep = "; sleep " .. sleep_duration .. "'"
 
         vim.cmd(cmd_head .. dimensions .. cmd .. sleep)
     else
@@ -109,6 +114,16 @@ local function split_window(cmd, side)
     end
 end
 
+-- run lazygit in an overlay pane
+local function lazygit()
+    if vim.fn.executable("lazygit") == 1 then
+        overlay("lazygit", 0)
+    else
+        print("Error: lazygit not installed.")
+    end
+end
+
+
 --# NVIM DISPATCH #-------------------------------------------------------------
 
 -- call the appropriate function based on the option
@@ -123,27 +138,41 @@ function M.dispatch(option)
         return 1
     end
 
-    local extension = get_file_extension()
-    local make, run = get_commands_for_extension(extension)
+    if M.config.save_session then
+        vim.cmd(":wall")
+    end
 
-    if option == "Make" then
-        overlay(make)
+    local extension = get_file_extension()
+    local make, run, debug = get_commands_for_extension(extension)
+
+    if option == "lazygit" then
+        lazygit()
     elseif option == "Run" then
-        overlay(run)
+        overlay(run, M.config.overlay_sleep, "Run")
     elseif option == "RunV" then
-        split_window(run, "-v")
+        split_window(run, "-v", "Run")
     elseif option == "RunH" then
-        split_window(run, "-h")
-    elseif option == "MakeV" then
-        split_window(make, "-v")
-    elseif option == "MakeH" then
-        split_window(make, "-h")
-    elseif option == "MakeBG" then
-        new_window(make)
+        split_window(run, "-h", "Run")
     elseif option == "RunBG" then
-        new_window(run)
+        new_window(run, "Run")
+    elseif option == "Make" then
+        overlay(make, M.config.overlay_sleep, "Make")
+    elseif option == "MakeV" then
+        split_window(make, "-v", "Make")
+    elseif option == "MakeH" then
+        split_window(make, "-h", "Make")
+    elseif option == "MakeBG" then
+        new_window(make, "Make")
+    elseif option == "Debug" then
+        overlay(debug, M.config.overlay_sleep, "Debug")
+    elseif option == "DebugV" then
+        split_window(debug, "-v", "Debug")
+    elseif option == "DebugH" then
+        split_window(debug, "-h", "Debug")
+    elseif option == "DebugBG" then
+        new_window(debug, "Debug")
     else
-        print("Error: Invalid option. Please use one of: Make, Run, RunV, RunH, MakeBG, RunBG")
+        print("Error: Invalid option.")
     end
 end
 
@@ -153,7 +182,11 @@ vim.api.nvim_create_user_command('Switchboard', function(args)
 end, {
     nargs = 1,
     complete = function()
-        return { "Make", "Run", "RunV", "RunH", "RunBG", "MakeBG" }
+        return { "lazygit",
+                 "Run", "RunV", "RunH", "RunBG",
+                 "Make", "MakeV", "MakeH", "MakeBG",
+                 "Debug", "DebugV", "DebugH", "DebugBG"
+               }
     end,
 })
 
