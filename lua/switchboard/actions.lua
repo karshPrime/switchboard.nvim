@@ -93,6 +93,16 @@ function Actions.split_window( aCmd, aSide, aWidth, aHeight, aNewPane, aErrorNam
 end
 
 --
+-- run yazi in an overlay pane
+function Actions.yazi( aWidth, aHeight, aErrorName )
+    if vim.fn.executable( "yazi" ) == 1 then
+        Actions.overlay( "yazi", 0, aWidth, aHeight, aErrorName )
+    else
+        print( "Error: yazi not installed." )
+    end
+end
+
+--
 -- run lazygit in an overlay pane
 function Actions.lazygit( aWidth, aHeight, aErrorName )
     if vim.fn.executable( "lazygit" ) == 1 then

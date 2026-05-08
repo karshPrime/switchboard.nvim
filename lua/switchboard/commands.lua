@@ -95,6 +95,8 @@ function Commands.dispatch( aOption, aConfig )
 
     if aOption == "lazygit" then
         Actions.lazygit( aConfig.overlay_width_percent, aConfig.overlay_height_percent )
+    elseif aOption == "yazi" then
+        Actions.yazi( aConfig.overlay_width_percent, aConfig.overlay_height_percent )
     else
         local lOrientation = nil
         local lBackground = false
