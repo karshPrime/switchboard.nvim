@@ -4,10 +4,20 @@
 --# INITIALISE #----------------------------------------------------------------
 
 local M = {}
-M.config = {}
+M.config = {
+    overlay_sleep = 1,
+    overlay_width_percent = 80,
+    overlay_height_percent = 80,
+    build_run_window_title = "build",
+    build_run_config = {}
+}
 
 function M.setup(config)
-    M.config = config
+    M.config.overlay_sleep = config.overlay_sleep or M.config.overlay_sleep
+    M.config.overlay_width_percent = config.overlay_width_percent or M.config.overlay_width_percent
+    M.config.overlay_height_percent = config.overlay_height_percent or M.config.overlay_height_percent
+    M.config.build_run_window_title = config.build_run_window_title or M.config.build_run_window_title
+    M.config.build_run_config = config.build_run_config or M.config.build_run_config
 end
 
 --# CHECK ENVIRONMENT #---------------------------------------------------------
@@ -22,7 +32,6 @@ local function is_tmux_running()
     return vim.env.TMUX ~= nil
 end
 
-
 --# HELPER FUNCTIONS #----------------------------------------------------------
 
 -- get the file extension
@@ -34,7 +43,7 @@ end
 -- get build and run commands based on file extension
 local function get_commands_for_extension(extension)
     if extension then
-        for _, cfg in ipairs(M.config) do
+        for _, cfg in ipairs(M.config.build_run_config) do
             if vim.tbl_contains(cfg.extension, extension) then
                 return cfg.build, cfg.run
             end
@@ -52,12 +61,11 @@ local function tmux_window_exists(window_name)
     return result ~= ""
 end
 
-
 --# CALL FUNCTIONS #------------------------------------------------------------
 
 -- run command in a new or existing tmux window
-local function new_window(cmd, new_cmd)
-    local window_name = "build"
+local function new_window(cmd)
+    local window_name = M.config.build_run_window_title
 
     if tmux_window_exists(window_name) then
         local proj_dir = vim.fn.trim(vim.fn.system("pwd"))
@@ -75,16 +83,31 @@ local function new_window(cmd, new_cmd)
     end
 end
 
+-- run command in an overlay pane
+local function overlay(cmd)
+    if cmd then
+        local proj_dir = vim.fn.trim(vim.fn.system("pwd"))
+        local cmd_head = "silent !tmux display-popup -E -d" .. proj_dir
+
+        local dimensions = " -w " .. M.config.overlay_width_percent .. "\\% -h " .. M.config.overlay_height_percent .. "\\% '"
+
+        local sleep = "; sleep " .. M.config.overlay_sleep .. "'"
+
+        vim.cmd(cmd_head .. dimensions .. cmd .. sleep)
+    else
+        print("Error: Command not found for this extension")
+    end
+end
+
 -- run command in same window on a new pane
 local function split_window(cmd, side)
     if cmd then
         local cmd_head = "silent !tmux split-window " .. side
         vim.cmd(cmd_head .. " '" .. cmd .. "; exec zsh'")
     else
-        print("Error: No run command found for this extension")
+        print("Error: Command not found for this extension")
     end
 end
-
 
 --# NVIM DISPATCH #-------------------------------------------------------------
 
@@ -103,8 +126,10 @@ function M.dispatch(option)
     local extension = get_file_extension()
     local make, run = get_commands_for_extension(extension)
 
-    if option == "RunBG" then
-        new_window(run, true)
+    if option == "Make" then
+        overlay(make)
+    elseif option == "Run" then
+        overlay(run)
     elseif option == "RunV" then
         split_window(run, "-v")
     elseif option == "RunH" then
@@ -113,10 +138,12 @@ function M.dispatch(option)
         split_window(make, "-v")
     elseif option == "MakeH" then
         split_window(make, "-h")
-    elseif option == "Make" then
-        new_window(make, true)
+    elseif option == "MakeBG" then
+        new_window(make)
+    elseif option == "RunBG" then
+        new_window(run)
     else
-        print("Error: Invalid option. Please use one of: RunBG, RunV, RunH, Make")
+        print("Error: Invalid option. Please use one of: Make, Run, RunV, RunH, MakeBG, RunBG")
     end
 end
 
@@ -126,7 +153,7 @@ vim.api.nvim_create_user_command('Switchboard', function(args)
 end, {
     nargs = 1,
     complete = function()
-        return { "RunBG", "RunV", "RunH", "Make" }
+        return { "Make", "Run", "RunV", "RunH", "RunBG", "MakeBG" }
     end,
 })
 
