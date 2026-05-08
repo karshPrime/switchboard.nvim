@@ -40,13 +40,13 @@ require('switchboard').setup({
         {
             extension = {'c', 'cpp', 'h'},
             build = 'make',
-            run = 'make run',
+            run   = 'make run',
             debug = 'lldb',
         },
         {
             extension = {'rs'},
             build = 'cargo build',
-            run = 'cargo run',
+            run   = 'cargo run',
             -- not all properties are required for all extensions
         },
         {
@@ -56,8 +56,26 @@ require('switchboard').setup({
             -- but Build and Debug will return errors informing configs are
             -- missing
         }
+    },
+
+    -- Directory override config. [OPTIONAL] 
+    -- Set actions for a specific directory (per project basis)
+    project_override_config = {
+        {
+            project_base_dir = '/absolute/path/to/project',
+            build = 'make',
+            run   = 'make run',
+            debug = 'lldb',
+        },
+        {
+            project_base_dir = '~/Projects/ESP32/',
+            build = 'idf.py build',
+            run   = 'idf.py flash /dev/cu.usbmodem1101'
+            -- Only build will work for this path
+        }
     }
 })
+
 ```
 
 ## Keybinds
@@ -94,15 +112,16 @@ vim.keymap.set('n','<F5>', ':Switchboard Run<CR>', {silent=true})
 \* **Run** here includes both compiling and running the program, depending on the
 run command specified for the file extension.
 
-
-## Important Notice: Backward Compatibility Break
+<details>
+<summary>Important Notice: Backward Compatibility Break v1 -> v2</summary>
 Please note that backward compatibility is broken from Version 1 to Version 2
 due to the implementation of a more robust configuration system. In the previous
 version, user configuration consisted of a simple list of extensions with their
 associated make and run command properties. However, with the introduction of
 overlay functionality, it became necessary to add an identifier to this
 previously unnamed list, resulting in incompatibility with older configurations.
-
+<br>
 Apologies for any inconvenience this may cause. From version 2, the plugin has been
 designed with future-proofing in mind to ensure that such issues do not recur.
+</details>
 
