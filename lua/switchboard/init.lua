@@ -19,7 +19,7 @@ M.config = {
     local_config = "switchboard.lua",
 }
 
-local modes = { "split", "vsplit", "overlay", "background", "bind" }
+local modes = { "split", "vsplit", "overlay", "background", "quickfix", "bind" }
 
 function M.setup(aConfig)
     for key, value in pairs(aConfig) do

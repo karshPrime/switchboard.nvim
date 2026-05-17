@@ -7,7 +7,7 @@ local Env = require("switchboard.env")
 
 local Commands = {}
 
-local valid_modes = { split = true, vsplit = true, overlay = true, background = true }
+local valid_modes = { split = true, vsplit = true, overlay = true, background = true, quickfix = true }
 
 --
 -- get all available command names for completion
@@ -82,7 +82,7 @@ function Commands.dispatch(aArgs, aConfig)
 
     local parts = vim.split(vim.trim(aArgs), "%s+")
     if #parts < 2 then
-        print("Usage: Switchboard <mode> <command>  (modes: split, vsplit, overlay, background)")
+        print("Usage: Switchboard <mode> <command>  (modes: split, vsplit, overlay, background, quickfix)")
         return
     end
 
@@ -95,7 +95,7 @@ function Commands.dispatch(aArgs, aConfig)
     end
 
     if not valid_modes[lMode] then
-        print("Error: invalid mode '" .. lMode .. "'. Use: split, vsplit, overlay, background, bind")
+        print("Error: invalid mode '" .. lMode .. "'. Use: split, vsplit, overlay, background, quickfix, bind")
         return
     end
 
@@ -138,6 +138,9 @@ function Commands.dispatch(aArgs, aConfig)
         )
     elseif lMode == "background" then
         Actions.new_window(lCmd, aConfig.build_run_window_title, lCommandName)
+    elseif lMode == "quickfix" then
+        vim.fn.setqflist({}, " ", { lines = vim.fn.systemlist(lCmd) })
+        vim.cmd("copen")
     end
 end
 

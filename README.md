@@ -69,6 +69,7 @@ Then you bind keys once, and reuse them everywhere:
 -- Commands:
 vim.keymap.set('n', '<F5>', ':Switchboard split run<CR>', { silent = true })
 vim.keymap.set('n', '<F7>', ':Switchboard vsplit debug<CR>', { silent = true })  -- works only for C/C++ projects
+vim.keymap.set('n', '<F6>', ':Switchboard quickfix build<CR>', { silent = true }) -- :make extended
 vim.keymap.set('n', '<leader>g', ':Switchboard overlay lazygit<CR>', { silent = true }) -- works for all projects
 
 -- Keybinds:
@@ -96,6 +97,7 @@ Modes:
 * `split` – opens a horizontal split
 * `vsplit` – opens a vertical split
 * `background` – background tmux window (or background term buffer)
+* `quickfix` - run the command in quickfix mode and `:copen`
 
 
 Commands come from:
