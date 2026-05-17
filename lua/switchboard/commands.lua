@@ -1,6 +1,7 @@
 -- Commands.Lua
 
 local Actions = require("switchboard.actions")
+local Binds = require("switchboard.binds")
 local Helpers = require("switchboard.helpers")
 local Env = require("switchboard.env")
 
@@ -88,8 +89,13 @@ function Commands.dispatch(aArgs, aConfig)
     local lMode = parts[1]
     local lCommandName = parts[2]
 
+    if lMode == "bind" then
+        Binds.execute(lCommandName, aConfig)
+        return
+    end
+
     if not valid_modes[lMode] then
-        print("Error: invalid mode '" .. lMode .. "'. Use: split, vsplit, overlay, background")
+        print("Error: invalid mode '" .. lMode .. "'. Use: split, vsplit, overlay, background, bind")
         return
     end
 

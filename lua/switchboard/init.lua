@@ -19,7 +19,7 @@ M.config = {
     local_config = "switchboard.lua",
 }
 
-local modes = { "split", "vsplit", "overlay", "background" }
+local modes = { "split", "vsplit", "overlay", "background", "bind" }
 
 function M.setup(aConfig)
     for key, value in pairs(aConfig) do
@@ -51,7 +51,14 @@ end, {
                 return m:find(argLead, 1, true) == 1
             end, modes)
         else
-            local command_names = Commands.get_available_commands(M.config)
+            local lFirstArg = parts[2]
+            local command_names
+            if lFirstArg == "bind" then
+                local Binds = require("switchboard.binds")
+                command_names = Binds.get_available_binds(M.config)
+            else
+                command_names = Commands.get_available_commands(M.config)
+            end
             return vim.tbl_filter(function(c)
                 return c:find(argLead, 1, true) == 1
             end, command_names)
