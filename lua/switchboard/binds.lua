@@ -50,7 +50,7 @@ function Binds.execute(aBindName, aConfig)
     local lKeys = resolve_bind(aBindName, aConfig)
     if not lKeys then
         local lExtension = Helpers.get_file_extension()
-        vim.notify("Error: bind '" .. aBindName .. "' not found for " .. lExtension, vim.log.levels.ERROR)
+        vim.notify("Bind '" .. aBindName .. "' not found for " .. lExtension, vim.log.levels.ERROR)
         return
     end
 

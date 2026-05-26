@@ -24,7 +24,7 @@ end
 function TmuxActions.new_window(aCmd, aWindowName, aErrorName)
     if not aCmd then
         local lExtension = Helpers.get_file_extension()
-        vim.notify("Error: " .. aErrorName .. " command not found for ." .. lExtension, vim.log.levels.ERROR)
+        vim.notify(aErrorName .. " command not found for ." .. lExtension, vim.log.levels.ERROR)
         return 1
     end
 
@@ -42,7 +42,7 @@ end
 function TmuxActions.overlay(aCmd, aSleepDuration, aWidth, aHeight, aErrorName)
     if not aCmd then
         local lExtension = Helpers.get_file_extension()
-        vim.notify("Error: " .. aErrorName .. " command not found for ." .. lExtension, vim.log.levels.ERROR)
+        vim.notify(aErrorName .. " command not found for ." .. lExtension, vim.log.levels.ERROR)
         return 1
     end
 
@@ -69,7 +69,7 @@ end
 function TmuxActions.split_window(aCmd, aSide, aWidth, aHeight, aNewPane, aErrorName)
     if not aCmd then
         local lExtension = Helpers.get_file_extension()
-        vim.notify("Error: " .. aErrorName .. " command not found for ." .. lExtension, vim.log.levels.ERROR)
+        vim.notify(aErrorName .. " command not found for ." .. lExtension, vim.log.levels.ERROR)
         return 1
     end
 
