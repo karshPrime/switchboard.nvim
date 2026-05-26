@@ -12,13 +12,13 @@ function Helpers.search_project_defined_override_config(notify_missing_config, c
         local lFullPath = lCwd .. lPath .. "/" .. config_name
 
         if vim.fn.filereadable(lFullPath) == 1 then
-            vim.notify("Found TmuxCompile config file at " .. lFullPath, vim.log.levels.INFO)
+            vim.notify("Found Switchboard config file at " .. lFullPath, vim.log.levels.INFO)
             local lSuccess, lResult = pcall(dofile, lFullPath)
 
             if lSuccess then
                 return lResult
             else
-                vim.notify("Error loading TmuxCompile config file: " .. lResult, vim.log.levels.ERROR)
+                vim.notify("Failed loading Switchboard config file: " .. lResult, vim.log.levels.ERROR)
             end
         end
     end
@@ -29,7 +29,7 @@ function Helpers.search_project_defined_override_config(notify_missing_config, c
 
     if notify_missing_config then
         vim.notify(
-            "Did not find TMUXCompile config file or it is not readable. Paths searched:  "
+            "Switchboard: no config file found. Paths searched:  "
                 .. table.concat(lPathsSearched, "\n"),
             vim.log.levels.INFO
         )
