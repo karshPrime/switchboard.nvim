@@ -5,10 +5,6 @@ local Helpers = require("switchboard.helpers")
 local TermActions = {}
 
 
-vim.o.splitright = true
-vim.o.splitbelow = true
-
-
 --
 -- get project directory for terminal cwd
 local function get_project_dir()
@@ -91,9 +87,9 @@ function TermActions.split_window(aCmd, aSide, aWidth, aHeight, aNewPane, aError
     local lProjectDir = get_project_dir()
 
     if aSide == "v" then
-        vim.cmd("split")
+        vim.cmd("rightbelow split")
     else
-        vim.cmd("vsplit")
+        vim.cmd("rightbelow vsplit")
     end
 
     vim.cmd("term " .. aCmd)
