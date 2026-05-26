@@ -84,7 +84,7 @@ end
 --
 -- check if a tmux window with the given name exists
 function Helpers.tmux_window_exists(aWindowName)
-    local Result = vim.fn.system("tmux list-windows | grep -w " .. aWindowName)
+    local Result = vim.fn.system("tmux list-windows | grep -w " .. vim.fn.shellescape(aWindowName))
 
     return Result ~= ""
 end
