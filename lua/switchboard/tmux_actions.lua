@@ -24,16 +24,16 @@ end
 function TmuxActions.new_window(aCmd, aWindowName, aErrorName)
     if not aCmd then
         local lExtension = Helpers.get_file_extension()
-        vim.notify("Error: " .. aErrorName .. " command not found for ." .. lExtension, vim.log.levels.ERROR)
+        vim.notify(aErrorName .. " command not found for ." .. lExtension, vim.log.levels.ERROR)
         return 1
     end
 
     if Helpers.tmux_window_exists(aWindowName) then
         aCmd = Helpers.change_dir(aWindowName) .. aCmd
-        vim.fn.system("tmux selectw -t " .. aWindowName .. " \\; send-keys '" .. aCmd .. "' C-m")
+        vim.fn.system("tmux selectw -t " .. vim.fn.shellescape(aWindowName) .. " \\; send-keys " .. vim.fn.shellescape(aCmd) .. " C-m")
     else
-        local lProjectDir = vim.fn.trim(vim.fn.system("git rev-parse --show-toplevel 2>/dev/null || pwd")) .. " -n "
-        vim.fn.system("tmux neww -c " .. lProjectDir .. aWindowName .. " '" .. aCmd .. "; zsh'")
+        local lProjectDir = vim.fn.trim(vim.fn.system("git rev-parse --show-toplevel 2>/dev/null || pwd"))
+        vim.fn.system("tmux neww -c " .. vim.fn.shellescape(lProjectDir) .. " -n " .. vim.fn.shellescape(aWindowName) .. " " .. vim.fn.shellescape(aCmd .. "; zsh"))
     end
 end
 
@@ -42,23 +42,26 @@ end
 function TmuxActions.overlay(aCmd, aSleepDuration, aWidth, aHeight, aErrorName)
     if not aCmd then
         local lExtension = Helpers.get_file_extension()
-        vim.notify("Error: " .. aErrorName .. " command not found for ." .. lExtension, vim.log.levels.ERROR)
+        vim.notify(aErrorName .. " command not found for ." .. lExtension, vim.log.levels.ERROR)
         return 1
     end
 
     local lProjectDir = vim.fn.trim(vim.fn.system("git rev-parse --show-toplevel 2>/dev/null || pwd"))
 
-    local aCmdHead = "tmux display-popup -E -d" .. lProjectDir
-    local lDimensions = " -w " .. aWidth .. "\\% -h " .. aHeight .. "\\% '"
-
-    local lSleep
+    local lSuffix
     if aSleepDuration < 0 then
-        lSleep = "; read'"
+        lSuffix = "; read"
     else
-        lSleep = "; sleep " .. aSleepDuration .. "'"
+        lSuffix = "; sleep " .. aSleepDuration
     end
 
-    vim.fn.system(aCmdHead .. lDimensions .. aCmd .. lSleep)
+    vim.fn.system(
+        "tmux display-popup -E"
+            .. " -d " .. vim.fn.shellescape(lProjectDir)
+            .. " -w " .. aWidth .. "%"
+            .. " -h " .. aHeight .. "%"
+            .. " " .. vim.fn.shellescape(aCmd .. lSuffix)
+    )
 end
 
 --
@@ -66,7 +69,7 @@ end
 function TmuxActions.split_window(aCmd, aSide, aWidth, aHeight, aNewPane, aErrorName)
     if not aCmd then
         local lExtension = Helpers.get_file_extension()
-        vim.notify("Error: " .. aErrorName .. " command not found for ." .. lExtension, vim.log.levels.ERROR)
+        vim.notify(aErrorName .. " command not found for ." .. lExtension, vim.log.levels.ERROR)
         return 1
     end
 
@@ -87,16 +90,16 @@ function TmuxActions.split_window(aCmd, aSide, aWidth, aHeight, aNewPane, aError
     if lCurrentPane == lMovedPane or aNewPane then
         -- no adjacent pane exists or user wants a fresh one
         local lParameters = aSide .. " -l " .. lLengthPercentage[aSide] .. "%"
-        vim.fn.system("tmux splitw -" .. lParameters .. " '" .. aCmd .. "; zsh'")
+        vim.fn.system("tmux splitw -" .. lParameters .. " " .. vim.fn.shellescape(aCmd .. "; zsh"))
     elseif is_pane_idle(lMovedPane) then
         -- adjacent pane exists and is idle at a shell prompt
         aCmd = Helpers.change_dir(lMovedPane) .. aCmd
-        vim.fn.system("tmux send -t " .. lMovedPane .. " '" .. aCmd .. "' C-m")
+        vim.fn.system("tmux send -t " .. vim.fn.shellescape(lMovedPane) .. " " .. vim.fn.shellescape(aCmd) .. " C-m")
     else
         -- adjacent pane has a program running, create a new split instead
-        vim.fn.system("tmux selectp -t " .. lCurrentPane)
+        vim.fn.system("tmux selectp -t " .. vim.fn.shellescape(lCurrentPane))
         local lParameters = aSide .. " -l " .. lLengthPercentage[aSide] .. "%"
-        vim.fn.system("tmux splitw -" .. lParameters .. " '" .. aCmd .. "; zsh'")
+        vim.fn.system("tmux splitw -" .. lParameters .. " " .. vim.fn.shellescape(aCmd .. "; zsh"))
     end
 
     -- return to nvim pane

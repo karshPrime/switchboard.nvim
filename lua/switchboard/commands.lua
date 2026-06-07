@@ -82,7 +82,19 @@ function Commands.dispatch(aArgs, aConfig)
 
     local parts = vim.split(vim.trim(aArgs), "%s+")
     if #parts < 2 then
-        print("Usage: Switchboard <mode> <command>  (modes: split, vsplit, overlay, background, quickfix)")
+        local msg =
+        "Switchboard <mode> [command]\n\n" ..
+        "Modes:\n" ..
+        "  split       - open in horizontal split\n" ..
+        "  vsplit      - open in vertical split\n" ..
+        "  overlay     - open in overlay window\n" ..
+        "  background  - run in background\n" ..
+        "  quickfix    - send output to quickfix\n" ..
+        "  bind        - run a named bind\n" ..
+        "  version     - print plugin version\n" ..
+        "\ngithub:karshPrime/switchboard.nvim"
+
+        vim.notify(msg, vim.log.levels.WARN)
         return
     end
 
@@ -95,7 +107,7 @@ function Commands.dispatch(aArgs, aConfig)
     end
 
     if not valid_modes[lMode] then
-        print("Error: invalid mode '" .. lMode .. "'. Use: split, vsplit, overlay, background, quickfix, bind")
+        vim.notify("Invalid mode '" .. lMode .. "'. Use: split, vsplit, overlay, background, quickfix, bind", vim.log.levels.ERROR)
         return
     end
 
@@ -106,7 +118,7 @@ function Commands.dispatch(aArgs, aConfig)
     local lCmd = Commands.resolve_command(lCommandName, aConfig)
     if not lCmd then
         local lExtension = Helpers.get_file_extension()
-        print("Error: '" .. lCommandName .. "' not added for " .. lExtension)
+        vim.notify("'" .. lCommandName .. "' not defined for " .. lExtension, vim.log.levels.ERROR)
         return
     end
 
@@ -145,3 +157,4 @@ function Commands.dispatch(aArgs, aConfig)
 end
 
 return Commands
+

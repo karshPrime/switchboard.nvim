@@ -2,6 +2,7 @@
 
 local Commands = require("switchboard.commands")
 local Helpers = require("switchboard.helpers")
+local VERSION = "1.1.1"
 
 local M = {}
 M.config = {
@@ -19,7 +20,7 @@ M.config = {
     local_config = "switchboard.lua",
 }
 
-local modes = { "split", "vsplit", "overlay", "background", "quickfix", "bind" }
+local modes = { "split", "vsplit", "overlay", "background", "quickfix", "bind", "version" }
 
 function M.setup(aConfig)
     for key, value in pairs(aConfig) do
@@ -41,6 +42,14 @@ end
 
 -- nvim command integration
 vim.api.nvim_create_user_command("Switchboard", function(args)
+    local parts = vim.split(vim.trim(args.args or ""), "%s+")
+    local first = parts[1] or ""
+
+    if first == "version" then
+        vim.notify("Switchboard version: " .. VERSION, vim.log.levels.INFO)
+        return
+    end
+
     Commands.dispatch(args.args, M.config)
 end, {
     nargs = "+",
@@ -67,3 +76,4 @@ end, {
 })
 
 return M
+

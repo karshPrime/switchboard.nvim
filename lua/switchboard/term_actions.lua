@@ -5,10 +5,6 @@ local Helpers = require("switchboard.helpers")
 local TermActions = {}
 
 
-vim.o.splitright = true
-vim.o.splitbelow = true
-
-
 --
 -- get project directory for terminal cwd
 local function get_project_dir()
@@ -20,7 +16,7 @@ end
 function TermActions.new_window(aCmd, aWindowName, aErrorName)
     if not aCmd then
         local lExtension = Helpers.get_file_extension()
-        vim.notify("Error: " .. aErrorName .. " command not found for ." .. lExtension, vim.log.levels.ERROR)
+        vim.notify(aErrorName .. " command not found for ." .. lExtension, vim.log.levels.ERROR)
         return 1
     end
 
@@ -36,7 +32,7 @@ end
 function TermActions.overlay(aCmd, aSleepDuration, aWidth, aHeight, aErrorName)
     if not aCmd then
         local lExtension = Helpers.get_file_extension()
-        vim.notify("Error: " .. aErrorName .. " command not found for ." .. lExtension, vim.log.levels.ERROR)
+        vim.notify(aErrorName .. " command not found for ." .. lExtension, vim.log.levels.ERROR)
         return 1
     end
 
@@ -84,16 +80,16 @@ end
 function TermActions.split_window(aCmd, aSide, aWidth, aHeight, aNewPane, aErrorName)
     if not aCmd then
         local lExtension = Helpers.get_file_extension()
-        vim.notify("Error: " .. aErrorName .. " command not found for ." .. lExtension, vim.log.levels.ERROR)
+        vim.notify(aErrorName .. " command not found for ." .. lExtension, vim.log.levels.ERROR)
         return 1
     end
 
     local lProjectDir = get_project_dir()
 
     if aSide == "v" then
-        vim.cmd("split")
+        vim.cmd("rightbelow split")
     else
-        vim.cmd("vsplit")
+        vim.cmd("rightbelow vsplit")
     end
 
     vim.cmd("term " .. aCmd)
