@@ -92,7 +92,7 @@ function Commands.dispatch(aArgs, aConfig)
         "  quickfix    - send output to quickfix\n" ..
         "  bind        - run a named bind\n" ..
         "  version     - print plugin version\n" ..
-        "\ngithub:karshPrime/switchboard.nvim"
+        "\ngithub:karnull/switchboard.nvim"
 
         vim.notify(msg, vim.log.levels.WARN)
         return

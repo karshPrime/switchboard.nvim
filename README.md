@@ -22,7 +22,7 @@ Using the built-in package manager (Neovim 0.12+):
 
 ```lua
 vim.pack.add({
-    'https://github.com/karshPrime/switchboard.nvim',
+    'https://github.com/karnull/switchboard.nvim',
 })
 ```
 
@@ -153,7 +153,7 @@ require('switchboard').setup({
     }}
 })
 ```
-Alternatively, have a look at [my personal config](https://github.com/karshPrime/dotfiles/blob/main/nvim/lua/plugins/tmux.lua).
+Alternatively, have a look at [my personal config](https://github.com/karnull/dotfiles/blob/main/nvim/lua/plugins/tmux.lua).
 
 
 
