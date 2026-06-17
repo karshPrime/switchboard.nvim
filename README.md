@@ -4,6 +4,8 @@ Switchboard lets you run project commands without leaving Neovim. It picks the r
 
 It’s designed so the same keybinds work across different languages and projects.
 
+Added bonus, check out this [shell script](https://github.com/karnull/gists/blob/main/devenv.sh) to use the local `.commands` defined actions from shell interactively. Basically running same commands in shell on different projects for similar actions.
+
 ### What it does
 
 * Runs commands in splits, floating windows, or tmux
@@ -175,8 +177,6 @@ return {
     }
 }
 ```
-
-
 
 **In short:** define commands and editor actions once, use the same keybinds everywhere, and let Switchboard adapt to the project you’re in.
 
