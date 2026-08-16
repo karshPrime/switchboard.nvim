@@ -7,6 +7,12 @@ local TmuxActions = {}
 local shell_commands = { "zsh", "bash", "sh", "fish", "dash", "ksh", "csh", "tcsh" }
 
 --
+-- fallback shell to drop into once a command finishes
+local function login_shell()
+    return vim.env.SHELL or "sh"
+end
+
+--
 -- check if a pane is idle (running a shell, not a program)
 local function is_pane_idle(aPaneId)
     local lCurrentCommand =
@@ -33,7 +39,7 @@ function TmuxActions.new_window(aCmd, aWindowName, aErrorName)
         vim.fn.system("tmux selectw -t " .. vim.fn.shellescape(aWindowName) .. " \\; send-keys " .. vim.fn.shellescape(aCmd) .. " C-m")
     else
         local lProjectDir = vim.fn.trim(vim.fn.system("git rev-parse --show-toplevel 2>/dev/null || pwd"))
-        vim.fn.system("tmux neww -c " .. vim.fn.shellescape(lProjectDir) .. " -n " .. vim.fn.shellescape(aWindowName) .. " " .. vim.fn.shellescape(aCmd .. "; zsh"))
+        vim.fn.system("tmux neww -c " .. vim.fn.shellescape(lProjectDir) .. " -n " .. vim.fn.shellescape(aWindowName) .. " " .. vim.fn.shellescape(aCmd .. "; " .. login_shell()))
     end
 end
 
@@ -90,7 +96,7 @@ function TmuxActions.split_window(aCmd, aSide, aWidth, aHeight, aNewPane, aError
     if lCurrentPane == lMovedPane or aNewPane then
         -- no adjacent pane exists or user wants a fresh one
         local lParameters = aSide .. " -l " .. lLengthPercentage[aSide] .. "%"
-        vim.fn.system("tmux splitw -" .. lParameters .. " " .. vim.fn.shellescape(aCmd .. "; zsh"))
+        vim.fn.system("tmux splitw -" .. lParameters .. " " .. vim.fn.shellescape(aCmd .. "; " .. login_shell()))
     elseif is_pane_idle(lMovedPane) then
         -- adjacent pane exists and is idle at a shell prompt
         aCmd = Helpers.change_dir(lMovedPane) .. aCmd
@@ -99,7 +105,7 @@ function TmuxActions.split_window(aCmd, aSide, aWidth, aHeight, aNewPane, aError
         -- adjacent pane has a program running, create a new split instead
         vim.fn.system("tmux selectp -t " .. vim.fn.shellescape(lCurrentPane))
         local lParameters = aSide .. " -l " .. lLengthPercentage[aSide] .. "%"
-        vim.fn.system("tmux splitw -" .. lParameters .. " " .. vim.fn.shellescape(aCmd .. "; zsh"))
+        vim.fn.system("tmux splitw -" .. lParameters .. " " .. vim.fn.shellescape(aCmd .. "; " .. login_shell()))
     end
 
     -- return to nvim pane

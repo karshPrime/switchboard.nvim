@@ -50,8 +50,6 @@ function Helpers.get_matched_directory_override(aConfig)
             lConfigDir = lHomeDir .. lConfigDir:sub(2)
         end
 
-        vim.notify("Checking if " .. lFilename .. " matches " .. vim.pesc(lConfigDir), vim.log.levels.INFO)
-
         if string.match(lFilename, "^" .. vim.pesc(lConfigDir)) then
             return lConfig
         end

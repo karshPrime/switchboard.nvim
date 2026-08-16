@@ -17,14 +17,16 @@ M.config = {
     commands = {},
     build_run_config = {},
     notify_missing_project_config = false,
-    local_config = "switchboard.lua",
+    local_config = ".switchboard-config",
 }
 
 local modes = { "split", "vsplit", "overlay", "background", "quickfix", "bind", "version" }
 
 function M.setup(aConfig)
     for key, value in pairs(aConfig) do
-        M.config[key] = value or M.config[key]
+        if value ~= nil then
+            M.config[key] = value
+        end
     end
 
     local lLocalConfig = Helpers.search_project_defined_override_config(
@@ -34,10 +36,8 @@ function M.setup(aConfig)
 
     if lLocalConfig ~= nil then
         M.config["project_override_config"] = lLocalConfig
-        M.config["override_config_from_project"] = true
-    else
-        M.config["override_config_from_project"] = false
     end
+    M.config["override_config_from_project"] = M.config["project_override_config"] ~= nil
 end
 
 -- nvim command integration

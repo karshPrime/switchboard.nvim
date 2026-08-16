@@ -3,7 +3,6 @@
 local Actions = require("switchboard.actions")
 local Binds = require("switchboard.binds")
 local Helpers = require("switchboard.helpers")
-local Env = require("switchboard.env")
 
 local Commands = {}
 
@@ -76,10 +75,6 @@ end
 --
 -- commands dispatch
 function Commands.dispatch(aArgs, aConfig)
-    if not Env.is_tmux_running() and not Env.is_tmux_installed() then
-        -- neither tmux nor fallback issue; term backend always works
-    end
-
     local parts = vim.split(vim.trim(aArgs), "%s+")
     if #parts < 2 then
         local msg =

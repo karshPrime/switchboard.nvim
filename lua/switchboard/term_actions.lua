@@ -88,11 +88,16 @@ function TermActions.split_window(aCmd, aSide, aWidth, aHeight, aNewPane, aError
 
     if aSide == "v" then
         vim.cmd("rightbelow split")
+        local lHeight = math.floor(vim.o.lines * aHeight / 100)
+        vim.cmd("resize " .. lHeight)
     else
         vim.cmd("rightbelow vsplit")
+        local lWidth = math.floor(vim.o.columns * aWidth / 100)
+        vim.cmd("vertical resize " .. lWidth)
     end
 
-    vim.cmd("term " .. aCmd)
+    vim.fn.termopen(aCmd, { cwd = lProjectDir })
+    vim.cmd("startinsert")
 end
 
 return TermActions
